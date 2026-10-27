@@ -24,7 +24,7 @@ public class BookingController {
         return ResponseEntity.ok(bookings);
     }
 
-    @GetMapping("/api/bookings/{id}")
+    @GetMapping("/api/bookings/{bookingId}")
     public ResponseEntity<BookingDTO> getBookingById(@PathVariable Long bookingId){
         BookingDTO bookingDTO = bookingService.getBookingById(bookingId);
         return ResponseEntity.ok(bookingDTO);
@@ -36,14 +36,14 @@ public class BookingController {
         return ResponseEntity.ok(createdBookingDTO);
     }
 
-    @PutMapping("/api/bookings/{id}")
+    @PutMapping("/api/bookings/{bookingId}")
     public ResponseEntity<BookingDTO> updateBooking(@PathVariable Long bookingId, @RequestBody BookingDTO bookingDTO){
         BookingDTO createdBookingDTO = bookingService.updateBooking(bookingId, bookingDTO);
         return ResponseEntity.ok(createdBookingDTO);
     }
 
-    @DeleteMapping("/api/bookings/{id}")
-    public ResponseEntity<BookingDTO> deleteBooking(@PathVariable Long bookingId){
+    @DeleteMapping("/api/bookings/{bookingId}")
+    public ResponseEntity<Void> deleteBooking(@PathVariable Long bookingId){
         bookingService.deleteBooking(bookingId);
         return ResponseEntity.noContent().build();
     }
