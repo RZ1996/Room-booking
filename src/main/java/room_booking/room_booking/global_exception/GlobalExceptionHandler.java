@@ -1,0 +1,26 @@
+package room_booking.room_booking.global_exception;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import room_booking.room_booking.exceptions.BookingNotFoundException;
+import room_booking.room_booking.exceptions.UserAlreadyExistException;
+import room_booking.room_booking.exceptions.UserNotFoundException;
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> UserNotFoundException(UserNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(UserAlreadyExistException.class)
+    public ResponseEntity<String> UserAlreadyExistException(UserAlreadyExistException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(BookingNotFoundException.class)
+    public ResponseEntity<String> BookingNotFoundException(BookingNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+}
