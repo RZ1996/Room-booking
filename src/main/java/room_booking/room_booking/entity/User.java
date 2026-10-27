@@ -1,8 +1,5 @@
 package room_booking.room_booking.entity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -14,13 +11,19 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name="name", length = 50, nullable=false)
     private String name;
+
+    @Column(name="surName", length = 50, nullable=false)
     private String surName;
+
+    @Column(name="email", length = 100, nullable=false)
     private String email;
+
+    @Column(name="createdAt", nullable=false)
     private LocalDate createdAt;
 
-    enum Role{
-        ADMIN,
-        USER
-    }
+    @Enumerated(EnumType.STRING)
+    private Role role;
 }

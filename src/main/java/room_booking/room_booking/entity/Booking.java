@@ -15,21 +15,19 @@ public class Booking {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(name="startOfReservation", nullable=false)
     private LocalDateTime startOfReservation;
+
+    @Column(name="endOfReservation", nullable=false)
     private LocalDateTime  endOfReservation;
+
+    @Column(name="note", length=200)
     private String note;
 
-    enum Color{
-        BLUE,
-        GREEN,
-        RED
-    }
-
-    enum State{
-        ACTIVE,
-        CANCELED
-    }
-
-
+    @Enumerated(EnumType.STRING)
+    private Color color;
+    @Enumerated(EnumType.STRING)
+    private State state;
 
 }
+
