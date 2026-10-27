@@ -11,16 +11,16 @@ import room_booking.room_booking.exceptions.UserNotFoundException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> UserNotFoundException(UserNotFoundException ex) {
+    public ResponseEntity<String> userNotFoundException(UserNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(UserAlreadyExistException.class)
-    public ResponseEntity<String> UserAlreadyExistException(UserAlreadyExistException ex) {
+    public ResponseEntity<String> userAlreadyExistException(UserAlreadyExistException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(BookingNotFoundException.class)
-    public ResponseEntity<String> BookingNotFoundException(BookingNotFoundException ex) {
+    public ResponseEntity<String> bookingNotFoundException(BookingNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

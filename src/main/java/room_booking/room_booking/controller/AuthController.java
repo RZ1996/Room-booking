@@ -1,5 +1,7 @@
 package room_booking.room_booking.controller;
 import lombok.Data;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import room_booking.room_booking.dto.UserDTO;
@@ -15,8 +17,9 @@ public class AuthController {
         this.userService = userService;
     }
 
-    public UserDTO registerUser(@RequestBody UserDTO userDTO){
-
-        return null;
+    @PostMapping("/api/auth/register")
+    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO){
+        UserDTO registeredUserDTO = userService.registerUser(userDTO);
+        return ResponseEntity.ok(registeredUserDTO);
     }
 }
