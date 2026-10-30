@@ -16,25 +16,23 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final UserRepository userRepository;
-    private final UserService userService;
 
-    public BookingService(BookingRepository bookingRepository, BookingMapper bookingMapper, UserRepository userRepository, UserService userService){
+
+    public BookingService(BookingRepository bookingRepository, BookingMapper bookingMapper, UserRepository userRepository){
         this.bookingRepository = bookingRepository;
         this.bookingMapper = bookingMapper;
         this.userRepository = userRepository;
-        this.userService = userService;
+
     }
 
     public List<BookingDTO> getBookings(){
 
-        List<BookingDTO> bookings = bookingMapper.mapBookingsToBookingDTOs(bookingRepository.findAll());
-        return bookings;
+        return bookingMapper.mapBookingsToBookingDTOs(bookingRepository.findAll());
     }
 
     public BookingDTO getBookingById(Long id){
-        BookingDTO bookingDTO = bookingMapper.mapBookingToBookingDTO(bookingRepository.findById(id)
+        return bookingMapper.mapBookingToBookingDTO(bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found")));
-        return bookingDTO;
     }
 
     public BookingDTO createBooking(BookingRequestDTO bookingRequestDTO, Long userId){
@@ -43,6 +41,8 @@ public class BookingService {
         booking.setStartOfReservation(bookingRequestDTO.getStartOfReservation());
         booking.setEndOfReservation(bookingRequestDTO.getEndOfReservation());
         booking.setNote(bookingRequestDTO.getNote());
+        booking.setColor(bookingRequestDTO.getColor());
+        booking.setState(bookingRequestDTO.getState());
         bookingRepository.save(booking);
        return bookingMapper.mapBookingToBookingDTO(booking);
     }
@@ -50,20 +50,29 @@ public class BookingService {
     public BookingDTO updateBooking(Long bookingId, BookingRequestDTO bookingRequestDTO, Long userId){
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
-        userService.validateUser(booking.getUser().getId(), userId);
+       validateUser(booking.getUser().getId(), userId);
         booking.setStartOfReservation(bookingRequestDTO.getStartOfReservation());
         booking.setEndOfReservation(bookingRequestDTO.getEndOfReservation());
         booking.setNote(bookingRequestDTO.getNote());
+        booking.setColor(bookingRequestDTO.getColor());
+        booking.setState(bookingRequestDTO.getState());
         return bookingMapper.mapBookingToBookingDTO(booking);
     }
 
     public void deleteBooking(Long id, Long userId){
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
-        userService.validateUser(booking.getUser().getId(), userId);
+        validateUser(booking.getUser().getId(), userId);
         bookingRepository.deleteById(booking.getId());
 
     }
+
+    private void validateUser(Long booking, Long ownerId){
+        if(!booking.equals(ownerId))
+            throw new BookingNotFoundException("Booking not found");
+
+    }
+
 
 
 }

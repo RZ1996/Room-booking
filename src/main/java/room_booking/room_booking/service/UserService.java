@@ -2,16 +2,13 @@ package room_booking.room_booking.service;
 import org.springframework.stereotype.Service;
 import room_booking.room_booking.dto.LoginDTO;
 import room_booking.room_booking.dto.UserDTO;
-import room_booking.room_booking.entity.Booking;
 import room_booking.room_booking.entity.User;
-import room_booking.room_booking.exceptions.BookingNotFoundException;
 import room_booking.room_booking.exceptions.UserAlreadyExistException;
 import room_booking.room_booking.exceptions.UserNotFoundException;
 import room_booking.room_booking.mapper.UserMapper;
 import room_booking.room_booking.repository.UserRepository;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 @Service
 public class UserService {
@@ -44,12 +41,6 @@ public class UserService {
             throw new UserNotFoundException("User not found");
         }
         return null;
-    }
-
-    public void validateUser(Long booking, Long userId){
-      if(!booking.equals(userId))
-          throw new BookingNotFoundException("Booking not found");
-
     }
 
 
