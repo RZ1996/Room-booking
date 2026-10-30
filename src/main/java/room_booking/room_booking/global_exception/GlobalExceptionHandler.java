@@ -3,6 +3,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import room_booking.room_booking.exceptions.BookingAlreadyReserved;
 import room_booking.room_booking.exceptions.BookingNotFoundException;
 import room_booking.room_booking.exceptions.UserAlreadyExistException;
 import room_booking.room_booking.exceptions.UserNotFoundException;
@@ -22,5 +23,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BookingNotFoundException.class)
     public ResponseEntity<String> bookingNotFoundException(BookingNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(BookingAlreadyReserved.class)
+    public ResponseEntity<String> BookingAlreadyReserved(BookingAlreadyReserved ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 }

@@ -3,6 +3,7 @@ import lombok.Data;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import room_booking.room_booking.dto.BookingDTO;
+import room_booking.room_booking.dto.BookingRequestDTO;
 import room_booking.room_booking.service.BookingService;
 
 import java.util.List;
@@ -31,20 +32,20 @@ public class BookingController {
     }
 
     @PostMapping("/api/bookings")
-    public ResponseEntity<BookingDTO> createBooking(@RequestBody BookingDTO bookingDTO, @RequestParam Long userId){
-        BookingDTO createdBookingDTO = bookingService.createBooking(bookingDTO, userId);
+    public ResponseEntity<BookingDTO> createBooking(@RequestBody BookingRequestDTO bookingRequestDTO, @RequestParam Long userId){
+        BookingDTO createdBookingDTO = bookingService.createBooking(bookingRequestDTO, userId);
         return ResponseEntity.ok(createdBookingDTO);
     }
 
     @PutMapping("/api/bookings/{bookingId}")
-    public ResponseEntity<BookingDTO> updateBooking(@PathVariable Long bookingId, @RequestBody BookingDTO bookingDTO){
-        BookingDTO createdBookingDTO = bookingService.updateBooking(bookingId, bookingDTO);
+    public ResponseEntity<BookingDTO> updateBooking(@PathVariable Long bookingId, @RequestBody BookingRequestDTO bookingRequestDTO, @RequestParam Long userId){
+        BookingDTO createdBookingDTO = bookingService.updateBooking(bookingId, bookingRequestDTO, userId);
         return ResponseEntity.ok(createdBookingDTO);
     }
 
     @DeleteMapping("/api/bookings/{bookingId}")
-    public ResponseEntity<Void> deleteBooking(@PathVariable Long bookingId){
-        bookingService.deleteBooking(bookingId);
+    public ResponseEntity<Void> deleteBooking(@PathVariable Long bookingId, @RequestParam Long userId){
+        bookingService.deleteBooking(bookingId, userId);
         return ResponseEntity.noContent().build();
     }
 }
