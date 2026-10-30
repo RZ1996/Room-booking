@@ -3,6 +3,7 @@ import org.springframework.stereotype.Service;
 import room_booking.room_booking.dto.BookingDTO;
 import room_booking.room_booking.dto.BookingRequestDTO;
 import room_booking.room_booking.entity.Booking;
+import room_booking.room_booking.entity.State;
 import room_booking.room_booking.exceptions.BookingNotFoundException;
 import room_booking.room_booking.exceptions.UserNotFoundException;
 import room_booking.room_booking.mapper.BookingMapper;
@@ -42,7 +43,7 @@ public class BookingService {
         booking.setEndOfReservation(bookingRequestDTO.getEndOfReservation());
         booking.setNote(bookingRequestDTO.getNote());
         booking.setColor(bookingRequestDTO.getColor());
-        booking.setState(bookingRequestDTO.getState());
+        booking.setState(State.OPENED);
         bookingRepository.save(booking);
        return bookingMapper.mapBookingToBookingDTO(booking);
     }
@@ -55,7 +56,6 @@ public class BookingService {
         booking.setEndOfReservation(bookingRequestDTO.getEndOfReservation());
         booking.setNote(bookingRequestDTO.getNote());
         booking.setColor(bookingRequestDTO.getColor());
-        booking.setState(bookingRequestDTO.getState());
         return bookingMapper.mapBookingToBookingDTO(booking);
     }
 
