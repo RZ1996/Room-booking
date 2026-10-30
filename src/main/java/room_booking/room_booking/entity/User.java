@@ -21,8 +21,11 @@ public class User {
     @Column(name="email", length = 100, nullable=false)
     private String email;
 
-    @Column(name="createdAt", nullable=false)
+    @Column(name="createdAt", nullable=false, length = 100)
     private LocalDate createdAt;
+
+    @Column(name="password", nullable=false)
+    private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;

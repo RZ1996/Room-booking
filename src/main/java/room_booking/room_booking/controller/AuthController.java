@@ -1,4 +1,5 @@
 package room_booking.room_booking.controller;
+import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,13 +20,13 @@ public class AuthController {
     }
 
     @PostMapping("/api/auth/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO){
+    public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody UserDTO userDTO){
         UserDTO registeredUserDTO = userService.registerUser(userDTO);
         return ResponseEntity.ok(registeredUserDTO);
     }
 
     @PostMapping("/api/auth/login")
-    public ResponseEntity<UserDTO> loginUser(@RequestBody LoginDTO loginDTO){
+    public ResponseEntity<UserDTO> loginUser(@Valid @RequestBody LoginDTO loginDTO){
         UserDTO registeredUserDTO = userService.loginUser(loginDTO);
         return ResponseEntity.ok(registeredUserDTO);
     }

@@ -1,4 +1,5 @@
 package room_booking.room_booking.controller;
+import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,13 +33,13 @@ public class BookingController {
     }
 
     @PostMapping("/api/bookings")
-    public ResponseEntity<BookingDTO> createBooking(@RequestBody BookingRequestDTO bookingRequestDTO, @RequestParam Long userId){
+    public ResponseEntity<BookingDTO> createBooking(@Valid @RequestBody BookingRequestDTO bookingRequestDTO, @RequestParam Long userId){
         BookingDTO createdBookingDTO = bookingService.createBooking(bookingRequestDTO, userId);
         return ResponseEntity.ok(createdBookingDTO);
     }
 
     @PutMapping("/api/bookings/{bookingId}")
-    public ResponseEntity<BookingDTO> updateBooking(@PathVariable Long bookingId, @RequestBody BookingRequestDTO bookingRequestDTO, @RequestParam Long userId){
+    public ResponseEntity<BookingDTO> updateBooking(@PathVariable Long bookingId, @Valid @RequestBody BookingRequestDTO bookingRequestDTO, @RequestParam Long userId){
         BookingDTO createdBookingDTO = bookingService.updateBooking(bookingId, bookingRequestDTO, userId);
         return ResponseEntity.ok(createdBookingDTO);
     }
