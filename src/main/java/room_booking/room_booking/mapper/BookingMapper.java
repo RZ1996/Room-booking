@@ -9,7 +9,6 @@ import java.util.List;
 public interface BookingMapper {
 
     BookingDTO mapBookingToBookingDTO(Booking booking);
-    Booking mapBookingDTOToBooking(BookingDTO bookingDTO);
     List<BookingDTO> mapBookingsToBookingDTOs(List<Booking> bookings);
 
 }
