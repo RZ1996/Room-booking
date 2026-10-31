@@ -1,6 +1,7 @@
 package room_booking.room_booking.global_exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import room_booking.room_booking.exceptions.BookingAlreadyReserved;
@@ -28,5 +29,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BookingAlreadyReserved.class)
     public ResponseEntity<String> BookingAlreadyReserved(BookingAlreadyReserved ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<String> badCredentialsException(BadCredentialsException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 }

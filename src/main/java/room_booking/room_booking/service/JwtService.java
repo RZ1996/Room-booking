@@ -23,10 +23,10 @@ public class JwtService {
     public String generateToken(User user) {
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .subject(String.valueOf(user.getId()))        // id uživatele
+                .subject(String.valueOf(user.getId()))
                 .issuedAt(now)
-                .expiresAt(now.plus(1, ChronoUnit.HOURS))     // platnost 1 hodina
-                .claim("role", user.getRole().name())         // USER nebo ADMIN
+                .expiresAt(now.plus(1, ChronoUnit.HOURS))
+                .claim("role", user.getRole().name())
                 .build();
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
         return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();

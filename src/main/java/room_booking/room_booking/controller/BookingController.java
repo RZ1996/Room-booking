@@ -1,7 +1,9 @@
 package room_booking.room_booking.controller;
 import jakarta.validation.Valid;
-import lombok.Data;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import room_booking.room_booking.dto.BookingDTO;
 import room_booking.room_booking.dto.BookingRequestDTO;
@@ -10,42 +12,41 @@ import room_booking.room_booking.service.BookingService;
 import java.util.List;
 
 @RestController
-@Data
+@RequestMapping("/api/bookings")
 public class BookingController {
 
     private final BookingService bookingService;
 
-    public BookingController(BookingService bookingService){
-
+    public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
     }
 
-    @GetMapping("/api/bookings")
-    public ResponseEntity<List<BookingDTO>> getBookings(){
-        List<BookingDTO> bookings = bookingService.getBookings();
-        return ResponseEntity.ok(bookings);
+    @GetMapping
+    public ResponseEntity<List<BookingDTO>> getBookings() {
+        return ResponseEntity.ok(bookingService.getBookings());
     }
 
-    @GetMapping("/api/bookings/{bookingId}")
-    public ResponseEntity<BookingDTO> getBookingById(@PathVariable Long bookingId){
-        BookingDTO bookingDTO = bookingService.getBookingById(bookingId);
-        return ResponseEntity.ok(bookingDTO);
-    }
-
-    @PostMapping("/api/bookings")
-    public ResponseEntity<BookingDTO> createBooking(@Valid @RequestBody BookingRequestDTO bookingRequestDTO, @RequestParam Long userId){
+    @PostMapping
+    public ResponseEntity<BookingDTO> createBooking(@Valid @RequestBody BookingRequestDTO bookingRequestDTO,
+                                                    @AuthenticationPrincipal Jwt jwt) {
+        Long userId = Long.valueOf(jwt.getSubject());
         BookingDTO createdBookingDTO = bookingService.createBooking(bookingRequestDTO, userId);
-        return ResponseEntity.ok(createdBookingDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdBookingDTO);
     }
 
-    @PutMapping("/api/bookings/{bookingId}")
-    public ResponseEntity<BookingDTO> updateBooking(@PathVariable Long bookingId, @Valid @RequestBody BookingRequestDTO bookingRequestDTO, @RequestParam Long userId){
-        BookingDTO createdBookingDTO = bookingService.updateBooking(bookingId, bookingRequestDTO, userId);
-        return ResponseEntity.ok(createdBookingDTO);
+    @PutMapping("/{bookingId}")
+    public ResponseEntity<BookingDTO> updateBooking(@PathVariable Long bookingId,
+                                                    @Valid @RequestBody BookingRequestDTO bookingRequestDTO,
+                                                    @AuthenticationPrincipal Jwt jwt) {
+        Long userId = Long.valueOf(jwt.getSubject());
+        BookingDTO updatedBookingDTO = bookingService.updateBooking(bookingId, bookingRequestDTO, userId);
+        return ResponseEntity.ok(updatedBookingDTO);
     }
 
-    @DeleteMapping("/api/bookings/{bookingId}")
-    public ResponseEntity<Void> deleteBooking(@PathVariable Long bookingId, @RequestParam Long userId){
+    @DeleteMapping("/{bookingId}")
+    public ResponseEntity<Void> deleteBooking(@PathVariable Long bookingId,
+                                              @AuthenticationPrincipal Jwt jwt) {
+        Long userId = Long.valueOf(jwt.getSubject());
         bookingService.deleteBooking(bookingId, userId);
         return ResponseEntity.noContent().build();
     }

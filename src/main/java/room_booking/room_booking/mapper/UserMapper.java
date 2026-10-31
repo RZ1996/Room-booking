@@ -8,6 +8,5 @@ import room_booking.room_booking.entity.User;
 public interface UserMapper {
 
     UserDTO mapUserToUserDTO(User user);
-    User mapUserDTOtoUser(UserDTO registerDTO);
-    RegisterDTO mapUserToRegisterDTO(User user);
+    User mapRegisterDTOtoUser(User user);
 }

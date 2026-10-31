@@ -25,19 +25,19 @@ public class JwtConfig {
         this.key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
     }
 
-    // podepisuje tokeny při přihlášení
+
     @Bean
     public JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(key));
     }
 
-    // ověřuje podpis a platnost tokenu u každého požadavku
+
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
     }
 
-    // roli z tokenu ("USER" / "ADMIN") převede na ROLE_USER / ROLE_ADMIN pro hasRole(...)
+
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter roles = new JwtGrantedAuthoritiesConverter();
