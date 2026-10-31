@@ -6,6 +6,7 @@ import room_booking.room_booking.entity.Color;
 import room_booking.room_booking.entity.State;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -17,6 +18,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             Color color, State state, LocalDateTime newEnd, LocalDateTime newStart, Long id);
 
     Long countByUserIdAndStateAndStartOfReservationGreaterThan(Long userId, State state, LocalDateTime now);
+
+   List<Booking> findAllBookingByUserId(Long userId);
 
 
 

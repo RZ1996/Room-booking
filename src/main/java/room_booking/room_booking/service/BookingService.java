@@ -4,7 +4,6 @@ import room_booking.room_booking.dto.BookingDTO;
 import room_booking.room_booking.dto.BookingRequestDTO;
 import room_booking.room_booking.entity.Booking;
 import room_booking.room_booking.entity.Color;
-import room_booking.room_booking.entity.Role;
 import room_booking.room_booking.entity.State;
 import room_booking.room_booking.exceptions.*;
 import room_booking.room_booking.mapper.BookingMapper;
@@ -34,6 +33,11 @@ public class BookingService {
 
         return bookingMapper.mapBookingsToBookingDTOs(bookingRepository.findAll());
     }
+
+    public List<BookingDTO> getBookingsMy(Long userId){
+        return bookingMapper.mapBookingsToBookingDTOs(bookingRepository.findAllBookingByUserId(userId));
+    }
+
 
     public BookingDTO getBookingById(Long bookingId){
         return bookingMapper.mapBookingToBookingDTO(bookingRepository.findById(bookingId)

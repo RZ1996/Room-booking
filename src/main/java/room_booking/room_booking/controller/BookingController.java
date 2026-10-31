@@ -28,6 +28,13 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getBookings());
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<List<BookingDTO>> getBookingsMy(@AuthenticationPrincipal Jwt jwt) {
+        Long userId = Long.valueOf(Objects.requireNonNull(jwt.getSubject()));
+        List<BookingDTO> myBookings = bookingService.getBookingsMy(userId);
+        return ResponseEntity.ok(myBookings);
+    }
+
     @PostMapping
     public ResponseEntity<BookingDTO> createBooking(@Valid @RequestBody BookingRequestDTO bookingRequestDTO,
                                                     @AuthenticationPrincipal Jwt jwt) {
