@@ -4,11 +4,9 @@ import room_booking.room_booking.dto.BookingDTO;
 import room_booking.room_booking.dto.BookingRequestDTO;
 import room_booking.room_booking.entity.Booking;
 import room_booking.room_booking.entity.Color;
+import room_booking.room_booking.entity.Role;
 import room_booking.room_booking.entity.State;
-import room_booking.room_booking.exceptions.BookingAlreadyReserved;
-import room_booking.room_booking.exceptions.BookingNotFoundException;
-import room_booking.room_booking.exceptions.BookingWrongTimeException;
-import room_booking.room_booking.exceptions.UserNotFoundException;
+import room_booking.room_booking.exceptions.*;
 import room_booking.room_booking.mapper.BookingMapper;
 import room_booking.room_booking.repository.BookingRepository;
 import room_booking.room_booking.repository.UserRepository;
@@ -59,6 +57,8 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
         validateUser(booking.getUser().getId(), userId);
+        if(booking.getState().equals(State.CANCELLED))
+            throw new BookingAlreadyCancelled("Booking is already cancelled");
         setTimeForBooking(booking, bookingRequestDTO);
         validateRoomIsFreeForUpdate(bookingId, bookingRequestDTO.getColor(),
                 bookingRequestDTO.getStartOfReservation(), bookingRequestDTO.getEndOfReservation());
@@ -72,14 +72,21 @@ public class BookingService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
         validateUser(booking.getUser().getId(), userId);
-        bookingRepository.deleteById(booking.getId());
-
+        if(booking.getEndOfReservation().isBefore(LocalDateTime.now()))
+            throw new BookingIsExistingInThePast("Cannot cancelled old booking");
+        if(booking.getState().equals(State.CANCELLED))
+            throw new BookingAlreadyCancelled("Booking is already cancelled");
+        LocalDateTime now = LocalDateTime.now();
+        if (!now.isBefore(booking.getStartOfReservation()) && now.isBefore(booking.getEndOfReservation())) {
+            throw new BookingInProgressException("Cannot cancel a booking that is in progress");
+        }
+        booking.setState(State.CANCELLED);
+        bookingRepository.save(booking);
     }
 
     private void validateUser(Long ownerId, Long userId){
         if(!userId.equals(ownerId))
             throw new BookingNotFoundException("Booking not found");
-
     }
 
     private void setTimeForBooking(Booking booking, BookingRequestDTO bookingRequestDTO){
@@ -107,7 +114,6 @@ public class BookingService {
             throw new BookingAlreadyReserved("Room is already booked at this time");
         }
     }
-
 
 
 }

@@ -37,4 +37,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> BookingWrongTimeException(BookingWrongTimeException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(BookingAlreadyCancelled.class)
+    public ResponseEntity<String> BookingAlreadyCancelled(BookingAlreadyCancelled ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(BookingIsExistingInThePast.class)
+    public ResponseEntity<String> BookingIsExistingInThePast(BookingIsExistingInThePast ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BookingIsExistingInThePast.class)
+    public ResponseEntity<String> BookingInProgressException(BookingInProgressException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
 }
