@@ -62,7 +62,8 @@ public class BookingController {
     public ResponseEntity<Void> deleteBooking(@PathVariable Long bookingId,
                                               @AuthenticationPrincipal Jwt jwt) {
         Long userId = Long.valueOf(Objects.requireNonNull(jwt.getSubject()));
-        bookingService.deleteBooking(bookingId, userId);
+        boolean isAdmin = "ADMIN".equals(jwt.getClaimAsString("role"));
+        bookingService.deleteBooking(bookingId, userId, isAdmin);
         return ResponseEntity.noContent().build();
     }
 }

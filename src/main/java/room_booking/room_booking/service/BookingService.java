@@ -67,6 +67,8 @@ public class BookingService {
         validateUser(booking.getUser().getId(), userId);
         if(booking.getState().equals(State.CANCELLED))
             throw new BookingAlreadyCancelled("Booking is already cancelled");
+        if(!booking.getStartOfReservation().isAfter(LocalDateTime.now()))
+            throw new BookingInProgressException("Cannot update a booking that already started");
         setTimeForBooking(booking, bookingRequestDTO);
         validateRoomIsFreeForUpdate(bookingId, bookingRequestDTO.getColor(),
                 bookingRequestDTO.getStartOfReservation(), bookingRequestDTO.getEndOfReservation());
@@ -76,10 +78,12 @@ public class BookingService {
         return bookingMapper.mapBookingToBookingDTO(booking);
     }
 
-    public void deleteBooking(Long id, Long userId){
+    public void deleteBooking(Long id, Long userId, boolean isAdmin){
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
-        validateUser(booking.getUser().getId(), userId);
+        if(!isAdmin){
+            validateUser(booking.getUser().getId(), userId);
+        }
         if(booking.getEndOfReservation().isBefore(LocalDateTime.now()))
             throw new BookingIsExistingInThePast("Cannot cancelled old booking");
         if(booking.getState().equals(State.CANCELLED))
