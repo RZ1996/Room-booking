@@ -46,8 +46,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(BookingIsExistingInThePast.class)
+    @ExceptionHandler(BookingInProgressException.class)
     public ResponseEntity<String> BookingInProgressException(BookingInProgressException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+
+    @ExceptionHandler(BookingMaximumOpenedAmountException.class)
+    public ResponseEntity<String> BookingMaximumOpenedAmountException(BookingMaximumOpenedAmountException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 }

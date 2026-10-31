@@ -24,6 +24,7 @@ public class BookingController {
 
     @GetMapping
     public ResponseEntity<List<BookingDTO>> getBookings() {
+
         return ResponseEntity.ok(bookingService.getBookings());
     }
 

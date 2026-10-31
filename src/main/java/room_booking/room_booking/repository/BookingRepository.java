@@ -16,4 +16,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     boolean existsByColorAndStateAndStartOfReservationLessThanAndEndOfReservationGreaterThanAndIdNot(
             Color color, State state, LocalDateTime newEnd, LocalDateTime newStart, Long id);
 
+    Long countByUserIdAndStateAndStartOfReservationGreaterThan(Long userId, State state, LocalDateTime now);
+
+
+
 }

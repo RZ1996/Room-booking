@@ -42,6 +42,10 @@ public class BookingService {
 
 
     public BookingDTO createBooking(BookingRequestDTO bookingRequestDTO, Long userId){
+        Long countedBookings = bookingRepository.countByUserIdAndStateAndStartOfReservationGreaterThan(
+                userId, State.OPENED, LocalDateTime.now());
+        if(countedBookings >=5)
+            throw new BookingMaximumOpenedAmountException("Maximum 5 booking can be created");
         Booking booking = new Booking();
         booking.setUser(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found")));
         setTimeForBooking(booking, bookingRequestDTO);
