@@ -1,5 +1,6 @@
 package room_booking.room_booking.controller;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import room_booking.room_booking.dto.BookingDTO;
 import room_booking.room_booking.dto.BookingRequestDTO;
 import room_booking.room_booking.service.BookingService;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Objects;
@@ -23,15 +25,14 @@ public class BookingController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookingDTO>> getBookings() {
-
-        return ResponseEntity.ok(bookingService.getBookings());
+    public ResponseEntity<Page<BookingDTO>> getBookings(Pageable pageable) {
+        return ResponseEntity.ok(bookingService.getBookings(pageable));
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<BookingDTO>> getBookingsMy(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Page<BookingDTO>> getBookingsMy(@AuthenticationPrincipal Jwt jwt, Pageable pageable) {
         Long userId = Long.valueOf(Objects.requireNonNull(jwt.getSubject()));
-        List<BookingDTO> myBookings = bookingService.getBookingsMy(userId);
+        Page<BookingDTO> myBookings = bookingService.getBookingsMy(userId, pageable);
         return ResponseEntity.ok(myBookings);
     }
 

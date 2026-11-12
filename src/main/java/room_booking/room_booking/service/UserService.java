@@ -11,7 +11,7 @@ import room_booking.room_booking.entity.User;
 import room_booking.room_booking.exceptions.UserAlreadyExistException;
 import room_booking.room_booking.mapper.UserMapper;
 import room_booking.room_booking.repository.UserRepository;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 
 @Service
@@ -30,6 +30,7 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
+    @Transactional
     public UserDTO registerUser(RegisterDTO registerDTO) {
         if (userRepository.findByEmail(registerDTO.getEmail()).isPresent()) {
             throw new UserAlreadyExistException("User with this email already exists");
@@ -45,6 +46,7 @@ public class UserService {
         return userMapper.mapUserToUserDTO(user);
     }
 
+    @Transactional(readOnly = true)
     public TokenDTO loginUser(LoginDTO loginDTO) {
         User user = userRepository.findByEmail(loginDTO.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("Wrong email or password"));

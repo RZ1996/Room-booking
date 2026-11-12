@@ -1,4 +1,6 @@
 package room_booking.room_booking.service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import room_booking.room_booking.dto.BookingDTO;
 import room_booking.room_booking.dto.BookingRequestDTO;
@@ -9,10 +11,10 @@ import room_booking.room_booking.exceptions.*;
 import room_booking.room_booking.mapper.BookingMapper;
 import room_booking.room_booking.repository.BookingRepository;
 import room_booking.room_booking.repository.UserRepository;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BookingService {
@@ -29,26 +31,30 @@ public class BookingService {
 
     }
 
-    public List<BookingDTO> getBookings(){
+    @Transactional(readOnly = true)
+    public Page<BookingDTO> getBookings(Pageable pageable){
 
-        return bookingMapper.mapBookingsToBookingDTOs(bookingRepository.findAll());
+        return bookingRepository.findAll(pageable)
+                .map(bookingMapper::mapBookingToBookingDTO);
     }
 
-    public List<BookingDTO> getBookingsMy(Long userId){
-        return bookingMapper.mapBookingsToBookingDTOs(bookingRepository.findAllBookingByUserId(userId));
+    @Transactional(readOnly = true)
+    public Page<BookingDTO> getBookingsMy(Long userId, Pageable pageable){
+        return bookingRepository.findAllBookingByUserId(userId, pageable)
+                .map(bookingMapper::mapBookingToBookingDTO);
     }
 
-
+    @Transactional(readOnly = true)
     public BookingDTO getBookingById(Long bookingId){
         return bookingMapper.mapBookingToBookingDTO(bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found")));
     }
 
-
+    @Transactional
     public BookingDTO createBooking(BookingRequestDTO bookingRequestDTO, Long userId){
         Long countedBookings = bookingRepository.countByUserIdAndStateAndStartOfReservationGreaterThan(
                 userId, State.OPENED, LocalDateTime.now());
-        if(countedBookings >=5)
+        if(countedBookings >= 5)
             throw new BookingMaximumOpenedAmountException("Maximum 5 booking can be created");
         Booking booking = new Booking();
         booking.setUser(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found")));
@@ -60,7 +66,7 @@ public class BookingService {
         bookingRepository.save(booking);
        return bookingMapper.mapBookingToBookingDTO(booking);
     }
-
+    @Transactional
     public BookingDTO updateBooking(Long bookingId, BookingRequestDTO bookingRequestDTO, Long userId){
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
@@ -78,6 +84,7 @@ public class BookingService {
         return bookingMapper.mapBookingToBookingDTO(booking);
     }
 
+    @Transactional
     public void deleteBooking(Long id, Long userId, boolean isAdmin){
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
