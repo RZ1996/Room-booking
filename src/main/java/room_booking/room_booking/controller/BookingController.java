@@ -1,6 +1,8 @@
 package room_booking.room_booking.controller;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -8,10 +10,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import room_booking.room_booking.dto.BookingDTO;
 import room_booking.room_booking.dto.BookingRequestDTO;
+import room_booking.room_booking.entity.Color;
 import room_booking.room_booking.service.BookingService;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -25,15 +26,20 @@ public class BookingController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<BookingDTO>> getBookings(Pageable pageable) {
-        return ResponseEntity.ok(bookingService.getBookings(pageable));
+    public ResponseEntity<PagedModel<BookingDTO>> getBookings(
+            @RequestParam(required = false) Color color,
+            @PageableDefault(size = 20, sort = "startOfReservation") Pageable pageable) {
+        Page<BookingDTO> bookings = bookingService.getBookings(color, pageable);
+        return ResponseEntity.ok(new PagedModel<>(bookings));
     }
 
     @GetMapping("/my")
-    public ResponseEntity<Page<BookingDTO>> getBookingsMy(@AuthenticationPrincipal Jwt jwt, Pageable pageable) {
+    public ResponseEntity<PagedModel<BookingDTO>> getBookingsMy(
+            @AuthenticationPrincipal Jwt jwt,
+            @PageableDefault(size = 20, sort = "startOfReservation") Pageable pageable) {
         Long userId = Long.valueOf(Objects.requireNonNull(jwt.getSubject()));
         Page<BookingDTO> myBookings = bookingService.getBookingsMy(userId, pageable);
-        return ResponseEntity.ok(myBookings);
+        return ResponseEntity.ok(new PagedModel<>(myBookings));
     }
 
     @PostMapping

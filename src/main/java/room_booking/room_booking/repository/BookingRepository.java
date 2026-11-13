@@ -22,6 +22,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Long countByUserIdAndStateAndStartOfReservationGreaterThan(Long userId, State state, LocalDateTime now);
 
     Page<Booking> findAllBookingByUserId(Long userId, Pageable pageable);
+    Page<Booking> findByColor(Color color, Pageable pageable);
+
 
 
 

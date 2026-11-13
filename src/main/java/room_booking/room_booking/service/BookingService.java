@@ -13,7 +13,6 @@ import room_booking.room_booking.repository.BookingRepository;
 import room_booking.room_booking.repository.UserRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -32,10 +31,14 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public Page<BookingDTO> getBookings(Pageable pageable){
-
-        return bookingRepository.findAll(pageable)
-                .map(bookingMapper::mapBookingToBookingDTO);
+    public Page<BookingDTO> getBookings(Color color, Pageable pageable){
+        Page<Booking> bookings;
+        if (color == null) {
+            bookings = bookingRepository.findAll(pageable);
+        } else {
+            bookings = bookingRepository.findByColor(color, pageable);
+        }
+        return bookings.map(bookingMapper::mapBookingToBookingDTO);
     }
 
     @Transactional(readOnly = true)
