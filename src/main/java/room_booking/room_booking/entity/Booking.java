@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @Table(indexes = {
-        @Index(name = "idx_booking_color_state_start_end",
-                columnList = "color, state, startOfReservation, endOfReservation"),
+        @Index(name = "idx_booking_room_state_start_end",
+                columnList = "room_id, state, startOfReservation, endOfReservation"),
         @Index(name = "idx_booking_user_state_start",
                 columnList = "user_id, state, startOfReservation")
 })
@@ -20,6 +20,10 @@ public class Booking {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room room;
+
     @Column(name="startOfReservation", nullable=false)
     private LocalDateTime startOfReservation;
 
@@ -30,9 +34,6 @@ public class Booking {
     private String note;
 
     @Enumerated(EnumType.STRING)
-    private Color color;
-    @Enumerated(EnumType.STRING)
     private State state;
 
 }
-

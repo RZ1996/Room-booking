@@ -10,7 +10,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import room_booking.room_booking.dto.BookingDTO;
 import room_booking.room_booking.dto.BookingRequestDTO;
-import room_booking.room_booking.entity.Color;
 import room_booking.room_booking.service.BookingService;
 import org.springframework.data.domain.Pageable;
 import java.util.Objects;
@@ -27,9 +26,9 @@ public class BookingController {
 
     @GetMapping
     public ResponseEntity<PagedModel<BookingDTO>> getBookings(
-            @RequestParam(required = false) Color color,
+            @RequestParam(required = false) Long roomId,
             @PageableDefault(size = 20, sort = "startOfReservation") Pageable pageable) {
-        Page<BookingDTO> bookings = bookingService.getBookings(color, pageable);
+        Page<BookingDTO> bookings = bookingService.getBookings(roomId, pageable);
         return ResponseEntity.ok(new PagedModel<>(bookings));
     }
 

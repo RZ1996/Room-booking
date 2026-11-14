@@ -5,11 +5,12 @@ import org.springframework.stereotype.Service;
 import room_booking.room_booking.dto.BookingDTO;
 import room_booking.room_booking.dto.BookingRequestDTO;
 import room_booking.room_booking.entity.Booking;
-import room_booking.room_booking.entity.Color;
+import room_booking.room_booking.entity.Room;
 import room_booking.room_booking.entity.State;
 import room_booking.room_booking.exceptions.*;
 import room_booking.room_booking.mapper.BookingMapper;
 import room_booking.room_booking.repository.BookingRepository;
+import room_booking.room_booking.repository.RoomRepository;
 import room_booking.room_booking.repository.UserRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -21,22 +22,24 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final UserRepository userRepository;
+    private final RoomRepository roomRepository;
 
 
-    public BookingService(BookingRepository bookingRepository, BookingMapper bookingMapper, UserRepository userRepository){
+    public BookingService(BookingRepository bookingRepository, BookingMapper bookingMapper,
+                          UserRepository userRepository, RoomRepository roomRepository){
         this.bookingRepository = bookingRepository;
         this.bookingMapper = bookingMapper;
         this.userRepository = userRepository;
-
+        this.roomRepository = roomRepository;
     }
 
     @Transactional(readOnly = true)
-    public Page<BookingDTO> getBookings(Color color, Pageable pageable){
+    public Page<BookingDTO> getBookings(Long roomId, Pageable pageable){
         Page<Booking> bookings;
-        if (color == null) {
+        if (roomId == null) {
             bookings = bookingRepository.findAll(pageable);
         } else {
-            bookings = bookingRepository.findByColor(color, pageable);
+            bookings = bookingRepository.findByRoomId(roomId, pageable);
         }
         return bookings.map(bookingMapper::mapBookingToBookingDTO);
     }
@@ -62,12 +65,13 @@ public class BookingService {
         Booking booking = new Booking();
         booking.setUser(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found")));
         setTimeForBooking(booking, bookingRequestDTO);
-        validateRoomIsFree(bookingRequestDTO.getColor(), bookingRequestDTO.getStartOfReservation(), bookingRequestDTO.getEndOfReservation());
+        Room room = findActiveRoom(bookingRequestDTO.getRoomId());
+        validateRoomIsFree(room.getId(), bookingRequestDTO.getStartOfReservation(), bookingRequestDTO.getEndOfReservation());
         booking.setNote(bookingRequestDTO.getNote());
-        booking.setColor(bookingRequestDTO.getColor());
+        booking.setRoom(room);
         booking.setState(State.OPENED);
         bookingRepository.save(booking);
-       return bookingMapper.mapBookingToBookingDTO(booking);
+        return bookingMapper.mapBookingToBookingDTO(booking);
     }
     @Transactional
     public BookingDTO updateBooking(Long bookingId, BookingRequestDTO bookingRequestDTO, Long userId){
@@ -79,10 +83,11 @@ public class BookingService {
         if(!booking.getStartOfReservation().isAfter(LocalDateTime.now()))
             throw new BookingInProgressException("Cannot update a booking that already started");
         setTimeForBooking(booking, bookingRequestDTO);
-        validateRoomIsFreeForUpdate(bookingId, bookingRequestDTO.getColor(),
+        Room room = findActiveRoom(bookingRequestDTO.getRoomId());
+        validateRoomIsFreeForUpdate(bookingId, room.getId(),
                 bookingRequestDTO.getStartOfReservation(), bookingRequestDTO.getEndOfReservation());
         booking.setNote(bookingRequestDTO.getNote());
-        booking.setColor(bookingRequestDTO.getColor());
+        booking.setRoom(room);
         bookingRepository.save(booking);
         return bookingMapper.mapBookingToBookingDTO(booking);
     }
@@ -111,6 +116,14 @@ public class BookingService {
             throw new BookingNotFoundException("Booking not found");
     }
 
+    private Room findActiveRoom(Long roomId){
+        Room room = roomRepository.findByIdForUpdate(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found"));
+        if(!room.isActive())
+            throw new RoomNotActiveException("Room is not active");
+        return room;
+    }
+
     private void setTimeForBooking(Booking booking, BookingRequestDTO bookingRequestDTO){
         if((!bookingRequestDTO.getStartOfReservation().isBefore(bookingRequestDTO.getEndOfReservation())))
             throw new BookingWrongTimeException("End must be after start");
@@ -123,16 +136,16 @@ public class BookingService {
         booking.setEndOfReservation(bookingRequestDTO.getEndOfReservation());
     }
 
-    private void validateRoomIsFree(Color color, LocalDateTime start, LocalDateTime end) {
-        if (bookingRepository.existsByColorAndStateAndStartOfReservationLessThanAndEndOfReservationGreaterThan(
-                color, State.OPENED, end, start)) {
+    private void validateRoomIsFree(Long roomId, LocalDateTime start, LocalDateTime end) {
+        if (bookingRepository.existsByRoomIdAndStateAndStartOfReservationLessThanAndEndOfReservationGreaterThan(
+                roomId, State.OPENED, end, start)) {
             throw new BookingAlreadyReserved("Room is already booked at this time");
         }
     }
 
-    private void validateRoomIsFreeForUpdate(Long bookingId, Color color, LocalDateTime start, LocalDateTime end) {
-        if (bookingRepository.existsByColorAndStateAndStartOfReservationLessThanAndEndOfReservationGreaterThanAndIdNot(
-                color, State.OPENED, end, start, bookingId)) {
+    private void validateRoomIsFreeForUpdate(Long bookingId, Long roomId, LocalDateTime start, LocalDateTime end) {
+        if (bookingRepository.existsByRoomIdAndStateAndStartOfReservationLessThanAndEndOfReservationGreaterThanAndIdNot(
+                roomId, State.OPENED, end, start, bookingId)) {
             throw new BookingAlreadyReserved("Room is already booked at this time");
         }
     }

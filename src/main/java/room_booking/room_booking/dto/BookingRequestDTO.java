@@ -3,7 +3,6 @@ package room_booking.room_booking.dto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import room_booking.room_booking.entity.Color;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +10,7 @@ import java.time.LocalDateTime;
 public class BookingRequestDTO {
 
     @NotNull
-    private Color color;
+    private Long roomId;
 
     @NotNull
     private LocalDateTime startOfReservation;
