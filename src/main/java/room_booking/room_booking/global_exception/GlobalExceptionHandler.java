@@ -61,4 +61,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         return new ResponseEntity<>("Data already exists", HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(RoomNotFoundException.class)
+    public ResponseEntity<String> roomNotFoundException(RoomNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }
