@@ -1,4 +1,5 @@
 package room_booking.room_booking.global_exception;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -55,5 +56,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BookingMaximumOpenedAmountException.class)
     public ResponseEntity<String> BookingMaximumOpenedAmountException(BookingMaximumOpenedAmountException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        return new ResponseEntity<>("Data already exists", HttpStatus.CONFLICT);
     }
 }

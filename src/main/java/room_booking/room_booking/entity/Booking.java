@@ -3,9 +3,14 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
-
 @Entity
 @Data
+@Table(indexes = {
+        @Index(name = "idx_booking_color_state_start_end",
+                columnList = "color, state, startOfReservation, endOfReservation"),
+        @Index(name = "idx_booking_user_state_start",
+                columnList = "user_id, state, startOfReservation")
+})
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

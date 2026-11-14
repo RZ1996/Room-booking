@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 @Entity
 @Data
+@Table(uniqueConstraints = @UniqueConstraint(name = "uk_user_email", columnNames = "email"))
 public class User {
 
     @Id
