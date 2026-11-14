@@ -2,6 +2,7 @@ package room_booking.room_booking.global_exception;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -69,5 +70,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RoomNotActiveException.class)
     public ResponseEntity<String> roomNotActiveException(RoomNotActiveException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<String> optimisticLockException(ObjectOptimisticLockingFailureException ex) {
+        return new ResponseEntity<>("Booking was changed by someone else, try again", HttpStatus.CONFLICT);
     }
 }

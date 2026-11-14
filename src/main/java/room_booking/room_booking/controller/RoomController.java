@@ -2,8 +2,7 @@ package room_booking.room_booking.controller;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import room_booking.room_booking.dto.RoomDTO;
 import room_booking.room_booking.dto.RoomRequestDTO;
@@ -26,26 +25,16 @@ public class RoomController {
     }
 
     @PostMapping
-    public ResponseEntity<RoomDTO> createRoom(@Valid @RequestBody RoomRequestDTO roomRequestDTO,
-                                              @AuthenticationPrincipal Jwt jwt) {
-        if (!isAdmin(jwt)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<RoomDTO> createRoom(@Valid @RequestBody RoomRequestDTO roomRequestDTO) {
         RoomDTO createdRoomDTO = roomService.createRoom(roomRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRoomDTO);
     }
 
     @PutMapping("/{roomId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RoomDTO> updateRoom(@PathVariable Long roomId,
-                                              @Valid @RequestBody RoomRequestDTO roomRequestDTO,
-                                              @AuthenticationPrincipal Jwt jwt) {
-        if (!isAdmin(jwt)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+                                              @Valid @RequestBody RoomRequestDTO roomRequestDTO) {
         return ResponseEntity.ok(roomService.updateRoom(roomId, roomRequestDTO));
-    }
-
-    private boolean isAdmin(Jwt jwt) {
-        return "ADMIN".equals(jwt.getClaimAsString("role"));
     }
 }
