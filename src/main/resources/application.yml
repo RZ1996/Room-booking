@@ -10,6 +10,14 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: validate
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+        max.block.ms: 5000
   data:
     web:
       pageable:
