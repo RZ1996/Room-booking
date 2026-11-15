@@ -1,12 +1,15 @@
 package room_booking.room_booking.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import room_booking.room_booking.dto.BookingDTO;
 import room_booking.room_booking.dto.BookingRequestDTO;
 import room_booking.room_booking.entity.Booking;
 import room_booking.room_booking.entity.Room;
 import room_booking.room_booking.entity.State;
+import room_booking.room_booking.event.BookingCancelledEvent;
+import room_booking.room_booking.event.BookingCreatedEvent;
 import room_booking.room_booking.exceptions.*;
 import room_booking.room_booking.mapper.BookingMapper;
 import room_booking.room_booking.repository.BookingRepository;
@@ -23,14 +26,17 @@ public class BookingService {
     private final BookingMapper bookingMapper;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     public BookingService(BookingRepository bookingRepository, BookingMapper bookingMapper,
-                          UserRepository userRepository, RoomRepository roomRepository){
+                          UserRepository userRepository, RoomRepository roomRepository,
+                          ApplicationEventPublisher eventPublisher){
         this.bookingRepository = bookingRepository;
         this.bookingMapper = bookingMapper;
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
@@ -71,6 +77,8 @@ public class BookingService {
         booking.setRoom(room);
         booking.setState(State.OPENED);
         bookingRepository.save(booking);
+        eventPublisher.publishEvent(new BookingCreatedEvent(booking.getId(), booking.getUser().getEmail(),
+                room.getName(), booking.getStartOfReservation(), booking.getEndOfReservation()));
         return bookingMapper.mapBookingToBookingDTO(booking);
     }
     @Transactional
@@ -109,6 +117,8 @@ public class BookingService {
         }
         booking.setState(State.CANCELLED);
         bookingRepository.save(booking);
+        eventPublisher.publishEvent(new BookingCancelledEvent(booking.getId(), booking.getUser().getEmail(),
+                booking.getRoom().getName(), booking.getStartOfReservation(), booking.getEndOfReservation()));
     }
 
     private void validateUser(Long ownerId, Long userId){
